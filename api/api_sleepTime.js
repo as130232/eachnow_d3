@@ -90,8 +90,8 @@ function getSleepTimeInfo(incrementCount) {
         if (randomHour >= 10) {
             sleepTimeObject.isSleepIn = 'Y';
         } else {
-            //是否有賴床,隨機範圍 0 :有賴床 ，其餘狀態無賴床, 賴床機率1/3
-            sleepTimeObject.isSleepIn = createRandomValue(0, 2) == 0 ? 'Y' : 'N';
+            //是否有賴床,隨機範圍 0 :有賴床 ，其餘狀態無賴床, 賴床機率1/4
+            sleepTimeObject.isSleepIn = createRandomValue(0, 3) == 0 ? 'Y' : 'N';
         }
     }
     var sleepInTime = 0;

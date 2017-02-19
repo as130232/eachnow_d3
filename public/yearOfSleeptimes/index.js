@@ -5,9 +5,8 @@ window.onload = function () {
     function init() {
         setMemberNoSelect();
 
-
     }
-    let memberAndSleepInfo = [];
+
     function setMemberNoSelect() {
         let memberArray = getMemberData();
         $("#memberSelect").append('<option value=>--請選擇會員編號--</option>');
@@ -18,115 +17,72 @@ window.onload = function () {
 
     $("#memberSelect").on("change", function () {
         let memberNo = $(this).val();
-        $("#memberSelect").data("memberNo",memberNo);
+        $("#memberSelect").data("memberNo", memberNo);
         console.log('whereCondition.memberNo:', memberNo);
     });
 
     $("#submitBtn").on("click", function () {
         let memberNoValue = $("#memberSelect").data("memberNo");
-        let whereCondition = {memberNo : memberNoValue};
+        let whereCondition = {
+            memberNo: memberNoValue
+        };
         let memberAndSleeptimesArray = getMemberAndSleeptimesData(whereCondition);
         let result = classifyBySleeptimes(memberAndSleeptimesArray);
+        d3.select("#yearOfSleeptimes svg").remove();
         drawSvgForYearOfSleeptimes(result);
     });
-    
-    
+
+
     //將一整年睡眠資訊分類，分別為有賴床、沒賴床、超過12點睡眠的Array
-    function classifyBySleeptimes(memberAndSleeptimesArray){
+    function classifyBySleeptimes(memberAndSleeptimesArray) {
         let member = memberAndSleeptimesArray[0];
         let sleeptimesArray = member.sleepTimes;
-        
+
         let result = {};
         result.member = member;
         //準時起床
-        result.onTime = {};
+        result.onTime = {
+            length: 0
+        };
         //有賴床
-        result.hasSleepIn = {};
+        result.hasSleepIn = {
+            length: 0
+        };
         //超過12點就寢
-        result.overTwelve = {};
-        
-        sleeptimesArray.forEach( function(data){
-            //有賴床
-            if(data.isSleepIn == "Y"){
+        result.overTwelve = {
+            length: 0
+        };
+
+        sleeptimesArray.forEach(function (data) {
+            //有賴床，紀錄的日期為起床時間(endSleepTime)
+            if (data.isSleepIn == "Y") {
                 //result.hasSleepIn.push(data);
-                let dateStr = convertToDate(data.startSleepMillisecond);
+                let dateStr = convertToDate(data.endSleepMillisecond);
                 result.hasSleepIn[dateStr] = true;
-                
-            }else{
+                result.hasSleepIn.length = (result.hasSleepIn.length + 1);
+                //無賴床，紀錄的日期一樣為起床時間(endSleepTime)    
+            } else {
                 //result.onTime.push(data);
-                let dateStr = convertToDate(data.startSleepMillisecond);
+                let dateStr = convertToDate(data.endSleepMillisecond);
                 result.onTime[dateStr] = true;
+                result.onTime.length = (result.onTime.length + 1);
             }
             //判斷是否有熬夜(取得當天日期的小時判斷是否有 小於 6)
             let startSleepDate = toDate(data.startSleepMillisecond);
             let isOverTwelveBoolean = isOverTwelve(startSleepDate.getHours());
-            if(isOverTwelveBoolean){
+            if (isOverTwelveBoolean) {
                 //result.overTwelve.push(data);
                 let dateStr = convertToDate(data.startSleepMillisecond);
                 result.overTwelve[dateStr] = true;
+                result.overTwelve.length = (result.overTwelve.length + 1);
             }
         });
         return result;
     }
-    
-    
+
+
     function drawSvgForYearOfSleeptimes(result) {
-        //let sleepIn = ;
-        
-        //對應的是off 紅色(紅色還有包含六日) (type A)
-        var bankHolidays = {
-            '01/01/2016': true,
-            '03/17/2016': true,
-            '03/25/2016': true,
-            '03/08/2016': true,
-            '05/02/2016': true,
-            '06/06/2016': true,
-            '08/01/2016': true,
-            '10/31/2016': true,
-            '12/26/2016': true,
-            '12/27/2016': true
-        };
-        //對應的是holidays 黃色 (type B)
-        var myHolidays = {
-            '01/04/2016': true,
-            '01/05/2016': true,
-            '01/06/2016': true,
-            '03/07/2016': true,
-            '03/09/2016': true,
-            '03/10/2016': true,
-            '03/11/2016': true,
-            '04/13/2016': true,
-            '04/14/2016': true,
-            '04/15/2016': true,
-            '06/15/2016': true,
-            '06/16/2016': true,
-            '06/17/2016': true,
-            '08/08/2016': true,
-            '08/09/2016': true,
-            '08/10/2016': true,
-            '08/11/2016': true,
-            '08/12/2016': true,
-            '08/15/2016': true,
-            '08/16/2016': true,
-            '08/17/2016': true,
-            '08/18/2016': true,
-            '08/19/2016': true,
-            '08/22/2016': true,
-            '08/23/2016': true,
-            '08/24/2016': true,
-            '08/25/2016': true,
-            '08/26/2016': true,
-            '08/08/2016': true,
-            '09/09/2016': true,
-            '09/12/2016': true,
-            '09/13/2016': true,
-            '10/10/2016': true,
-            '10/11/2016': true,
-            '12/28/2016': true,
-            '12/29/2016': true,
-            '12/30/2016': true
-        };
-        
+
         //set start and end range.
         var startDate = '2016-01-01';
         var endDate = '01/01/2017';
@@ -146,18 +102,17 @@ window.onload = function () {
                 month: date.month() + 1,
                 day: date.date(),
                 year: date.year(),
-                
+
                 //bankH: (bankHolidays[date.calendar()] === true) ? true : false,
                 //holiday: (myHolidays[date.calendar()] === true) ? true : false,
                 //根據傳遞進來的result，判斷一整年分別哪些天有賴床、準時起床、熬夜(過12點)
                 sleepIn: (result.hasSleepIn[date.calendar()] === true) ? true : false,
-                overTwelve:(result.overTwelve[date.calendar()] === true) ? true : false,
                 onTime: (result.onTime[date.calendar()] === true) ? true : false,
+                overTwelve: (result.overTwelve[date.calendar()] === true) ? true : false,
+
             });
-            //
             date.add(1, 'day');
         }
-        //
 
         //split into months
         //將所有日期利用filter過綠塞選出對應月份
@@ -172,7 +127,7 @@ window.onload = function () {
             });
         }
 
-        //calculate layouts
+        // calculate layouts
         // each month becomes a g element
         //每日的格字大小及每日格間距
         var dayWidth = 10;
@@ -209,12 +164,14 @@ window.onload = function () {
                     currentMonthY += dayHeight + dayPadding;
                 }
             });
+
             //月份的尺寸
             month.dimensions = {
                 height: month.days[month.days.length - 1].y + dayHeight,
                 width: (dayWidth * 7) + (dayPadding * 7)
             };
-            //根據天數X軸進行累加，排序出1-12月
+
+            //根據天數X軸進行累加，用以排序出1-12月
             month.x = currentMonthX;
             currentMonthX += month.dimensions.width + monthPadding;
         });
@@ -223,6 +180,8 @@ window.onload = function () {
 
 
         //vis
+
+        //根據user螢幕畫面大小設定svg的寬、高
         var width = document.getElementsByTagName('body')[0].clientWidth;
         var height = document.getElementsByTagName('body')[0].clientHeight;
 
@@ -235,19 +194,22 @@ window.onload = function () {
             .style('background-color', '#F8FFE5');
 
 
+        //1-12月份的整體群組元素
         var yearView = svg.append('g');
 
-
+        //單月元素
         var months = yearView.selectAll('g')
             .data(dataSplitByMonth)
             .enter()
             .append('g')
+            //根據每個月的x軸移動對應位置
             .attr('transform', function (d) {
-                return 'translate(' + d.x + ',0)'
+                return 'translate(' + d.x + ', 0)'
             })
 
+        //畫出每個月下的天數格字
         months.each(function (node) {
-
+            //this為g
             d3.select(this)
                 .selectAll('rect')
                 .data(node.days)
@@ -262,29 +224,23 @@ window.onload = function () {
                     return d.y
                 })
                 .attr('fill', function (d) {
-//                    if(d.bankH || d.weekDay === 0 || d.weekDay === 6) {
-//                        return '#EF476F';
-//                    } else if(d.holiday) {
-//                        return '#FFC43D';
-//                    } else {
-//                        return '#1B9AAA';
-//                    }
-                    
-                    //又熬夜又賴床的天數
-                    if(d.sleepIn && d.overTwelve){
-                        return '#00FF00';   //青色
-                        
-                    } else if (d.sleepIn) {      
-                        return '#EF476F';   //紅色
-                        
-                    } else if (d.onTime){
-                        return '#1B9AAA';   //藍色
-                        
+                    //又熬夜又賴床的天
+                    if (d.sleepIn && d.overTwelve) {
+                        return '#00FF00'; //青色
+                    }
+                    if (d.sleepIn) {
+                        return '#EF476F'; //紅色
+
                     } else if (d.overTwelve) {
-                        return '#FFC43D';   //黃色    
-                    } 
+                        return '#FFC43D'; //黃色  
+
+                    } else if (d.onTime) {
+                        return '#1B9AAA'; //藍色
+
+                    }
                 });
 
+            //增加月份名稱
             d3.select(this)
                 .append('text')
                 .text(function (d) {
@@ -299,72 +255,92 @@ window.onload = function () {
                 .style("font-size", "14pt")
         });
 
+        //將1-12月份群組元素置中
         yearView.attr('transform', function (d) {
             return 'translate(' + ((width - yearView.node().getBBox().width) / 2) + ',20)'
-        })
+                //getBBox可取得text元素的寬、高
+        });
 
 
-        //vis 2
+        //yearView與長條圖間的距離
         var marginStatsViewTop = 150;
 
         var statsView = svg.append('g')
             .attr('transform', 'translate( 0,' + (yearView.node().getBBox().height + marginStatsViewTop) + ')');
 
-        var categories = []
-        
-        //第一個判斷是否有賴床
-        categories.push(dataAll.filter((day) => {
-            //if (day.bankH === true || day.weekDay === 6 || day.weekDay === 0) {
-            
-            if (day.sleepIn === true) {    
+
+        //所有長條圖集合
+        var categories = [];
+
+        var sleepInObj = {};
+        sleepInObj.type = 'sleepIn';
+        sleepInObj.text = '賴床';
+        //過濾出賴床資料，用於長條圖
+        sleepInObj.data = dataAll.filter((day) => {
+            if (day.sleepIn === true) {
                 return true;
             } else {
                 return false;
             }
-        }));
-        //第二個為熬夜
-        categories.push(dataAll.filter((day) => {
-            //return day.holiday === true
+        });
+
+        var onTimeObj = {};
+        onTimeObj.type = 'onTime';
+        onTimeObj.text = '準時起床';
+        //過濾出準時起床資料，用於長條圖
+        onTimeObj.data = dataAll.filter((day) => {
+            if (day.onTime === true) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        var overTwelveObj = {};
+        overTwelveObj.type = 'overTwelve';
+        overTwelveObj.text = '熬夜數';
+        //過濾出資料，用於長條圖
+        overTwelveObj.data = dataAll.filter((day) => {
             return day.overTwelve === true;
-        }));
-        
-        //第三個為準時起床
-        categories.push(dataAll.filter((day) => {
-            //if (!day.holiday && !day.bankH && isWeekDay(day.weekDay)) {
-            if (!day.overTwelve && !day.sleepIn) {
-                return true;
-            } else {
-                return false;
-            }
-        }));
-
-        categories[0] = categories[0].map((el) => {
-            el.type = 'sleepIn';
-            el.text = 'sleepIn';    
-            return el;
-        });
-        categories[1] = categories[1].map((el) => {
-            el.type = 'overTwelve';
-            el.text = 'overTwelve';
-            return el;
-        });
-        categories[2] = categories[2].map((el) => {
-            el.type = 'onTime';
-            el.text = 'onTime';
-            return el;
         });
 
-        categories.sort((a, b) => b.length - a.length);
 
+        //set type and text
+        sleepInObj.data = sleepInObj.data.map((el) => {
+            el.type = sleepInObj.type;
+            el.text = sleepInObj.type;
+            return el;
+        });
+        onTimeObj.data = onTimeObj.data.map((el) => {
+            el.type = onTimeObj.type;
+            el.text = onTimeObj.type;
+            return el;
+        });
+        overTwelveObj.data = overTwelveObj.data.map((el) => {
+            el.type = overTwelveObj.type;
+            el.text = overTwelveObj.type;
+            return el;
+
+        });
+
+        categories.push(sleepInObj, onTimeObj, overTwelveObj);
+
+        //以資料量由大排到小
+        categories.sort((a, b) => b.data.length - a.data.length);
+
+        //設定長條圖的基準點及間距大小
         var startX = (width - yearView.node().getBBox().width) / 2;
         var barPadding = 80;
         var avalWidth = width - ((startX * 2) + (barPadding * 2));
         var barWidth = avalWidth / 3;
         var heightPlusBottomMarg = height - 100;
 
-        var maxLength = d3.max([categories[0].length, categories[1].length, categories[2].length])
+        var maxLength = d3.max([categories[0].data.length, categories[1].data.length, categories[2].data.length])
             // calc bar heigth;
         var startY = parseInt(statsView.attr('transform').split(',')[1].slice(0, -1));
+
+
+        //高度比例尺
         var heightScale = d3.scaleLinear()
             .domain([0, maxLength])
             .range([0, heightPlusBottomMarg - startY]);
@@ -373,45 +349,45 @@ window.onload = function () {
             .domain([0, maxLength])
             .range([heightPlusBottomMarg - startY, 0])
 
-        var statsData = [
-            {
-                x: startX,
-                y: yPosScale(categories[0].length),
-                w: barWidth,
-                h: heightScale(categories[0].length),
-                type: categories[0][0].type,
-                startY: yPosScale(3),
-                startH: heightScale(3),
-                text: categories[0][0].text,
-                offsetY: startY,
-                length: categories[0].length
-    },
-            {
-                x: startX + barWidth + barPadding,
-                y: yPosScale(categories[1].length),
-                w: barWidth,
-                h: heightScale(categories[1].length),
-                type: categories[1][0].type,
-                startY: yPosScale(3),
-                startH: heightScale(3),
-                text: categories[1][0].text,
-                offsetY: startY,
-                length: categories[1].length
-    },
-            {
-                x: startX + barWidth + barPadding + barWidth + barPadding,
-                y: yPosScale(categories[2].length),
-                w: barWidth,
-                h: heightScale(categories[2].length),
-                type: categories[2][0].type,
-                startY: yPosScale(3),
-                startH: heightScale(3),
-                text: categories[2][0].text,
-                offsetY: startY,
-                length: categories[2].length
-    }
-]
 
+
+        var statsData = [{
+                x: startX,
+                y: yPosScale(categories[0].data.length),
+                w: barWidth,
+                h: heightScale(categories[0].data.length),
+                type: categories[0].type,
+                startY: yPosScale(3),
+                startH: heightScale(3),
+                text: categories[0].text,
+                offsetY: startY,
+                length: categories[0].data.length
+            }, {
+                x: startX + barWidth + barPadding,
+                y: yPosScale(categories[1].data.length),
+                w: barWidth,
+                h: heightScale(categories[1].data.length),
+                type: categories[1].type,
+                startY: yPosScale(3),
+                startH: heightScale(3),
+                text: categories[1].text,
+                offsetY: startY,
+                length: categories[1].data.length
+            }, {
+                x: startX + barWidth + barPadding + barWidth + barPadding,
+                y: yPosScale(categories[2].data.length),
+                w: barWidth,
+                h: heightScale(categories[2].data.length),
+                type: categories[2].type,
+                startY: yPosScale(3),
+                startH: heightScale(3),
+                text: categories[2].text,
+                offsetY: startY,
+                length: categories[2].data.length
+            }
+        ];
+
+        //產生長條圖
         var bars = statsView.selectAll('rect')
             .data(statsData)
             .enter()
@@ -432,7 +408,7 @@ window.onload = function () {
                 if (d.type === 'sleepIn') return '#EF476F';
                 if (d.type === 'overTwelve') return '#FFC43D';
                 if (d.type === 'onTime') return '#1B9AAA';
-            })
+            });
 
         var barLables = statsView.selectAll('text')
             .data(statsData)
@@ -449,8 +425,8 @@ window.onload = function () {
                 return d.text;
             })
             .attr('fill', 'black')
-            .style("font-family", "Helvetica")
-            .style("font-size", "14pt");
+            .style("font-family", "微軟正黑體")
+            .style("font-size", "16pt");
 
         addTemporaryDayAndMoveTo(barLables, function (maxDur) {
 
@@ -467,7 +443,7 @@ window.onload = function () {
                 .on('end', function () {
                     counter++;
                     if (counter === 2) {
-                        console.log('kkk')
+                        //長條圖中的數字
                         statsView.selectAll('text').each(function (p, j) {
                             d3.select(this.parentNode)
                                 .append('text')
@@ -476,8 +452,8 @@ window.onload = function () {
                                 .attr("text-anchor", "middle")
                                 .text(p.length)
                                 .attr('fill', 'transparent')
-                                .style("font-family", "Helvetica")
-                                .style("font-size", "12pt")
+                                .style("font-family", "微軟正黑體")
+                                .style("font-size", "22pt")
                                 .transition()
                                 .duration(1000)
                                 .attrTween("fill", function () {
@@ -515,6 +491,7 @@ window.onload = function () {
                 return pos;
             }
 
+            //長條圖容器
             var textPos = {};
 
             statsView.selectAll('text').each(function (d) {
@@ -534,10 +511,12 @@ window.onload = function () {
                 .domain([0, positions.length])
                 .range([300, 2000]);
 
+            //365天的格子移動到對應的容器中動畫
             tempG.selectAll('rect')
                 .data(positions)
                 .enter()
                 .append('rect')
+                //格子起點:在原本各自的位置上
                 .attr('x', function (d) {
                     return d.x
                 })
