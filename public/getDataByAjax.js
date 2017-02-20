@@ -18,7 +18,6 @@ function getMemberData(whereCondition) {
     return result;
 }
 
-
 //member的複合查詢(取得所有會員，但只包含一筆睡眠時間)
 function getMemberAndOneSleeptimeData(whereCondition) {
     let result = [];

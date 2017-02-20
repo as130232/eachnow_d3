@@ -47,8 +47,6 @@ app.use(bodyParser.urlencoded({ //可處理表單的資料
 app.use(express.static(__dirname + '/public'));
 
 
-
-
 app.use('/api', apiRoutes);
 app.use('/api2', apiRoutes2);
 
