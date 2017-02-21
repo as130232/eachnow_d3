@@ -1,6 +1,5 @@
 var http = require('http');
 
-
 http.createServer(function (request, response){
     //httpStatus '200' is sucess.
     response.writeHead(200);

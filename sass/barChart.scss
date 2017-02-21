@@ -1,0 +1,10 @@
+$barChartBg:rgb(248,255,229);
+
+#barChart_div{
+    background-color: $barChartBg;
+    height: 100%;
+    #yearOfSleeptimes{
+        position: absolute;
+        right:2px;
+    }
+}

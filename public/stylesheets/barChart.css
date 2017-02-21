@@ -1,0 +1,10 @@
+/* line 3, ../../sass/barChart.scss */
+#barChart_div {
+  background-color: #f8ffe5;
+  height: 100%;
+}
+/* line 6, ../../sass/barChart.scss */
+#barChart_div #yearOfSleeptimes {
+  position: absolute;
+  right: 2px;
+}

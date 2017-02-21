@@ -1,3 +1,4 @@
+"use strict";
 /*
     controller
 */
@@ -18,14 +19,14 @@ module.exports = function (app) {
         res.send('my first page');
     });
 
-    app.get('/about', function (req, res) {
-        res.send('about page.');
-    });
+    // app.get('/about', function (req, res) {
+    //     res.send('about page.');
+    // });
     //取得所有會員(不包含睡眠時間)
 
     //member的複合查詢(不包含睡眠時間) 'memno000384'
     app.get('/member', function (req, res) {
-        let params = removeEmptyQuery(req.query);
+        var params = removeEmptyQuery(req.query);
         let whereCondition = classificationQuery(params);
         Member.find(
             whereCondition.membersQuery,
