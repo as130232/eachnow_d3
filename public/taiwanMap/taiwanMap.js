@@ -14,7 +14,7 @@ function getCityAvgSleepTime(){
     
     var sleepTimeMiliseconds = getSleepTimeMilisecondsInEachCity(allMemberSleepTimes);
     var avgSleepTimeInEachCityArr = getSleepTimeHoursInEachCity(sleepTimeMiliseconds);
-    //console.log(avgSleepTimeInEachCityArr)
+    console.log(avgSleepTimeInEachCityArr)
 }
 
 function getSleepTimeHoursInEachCity(sleepTimeMiliseconds){
