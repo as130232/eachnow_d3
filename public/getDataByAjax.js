@@ -120,3 +120,23 @@ function getAllMembersSleepTimesCountData(whereCondition) {
     });
     return result;
 }
+
+//取得所有會員的加總、平均的睡眠時間和賴床時間
+//http://localhost:3000/sleepTimes/allTotalAndAvgSleepTime
+function getAllTotalAndAvgSleepTime() {
+    let result = [];
+    $.ajax({
+        url: "/sleepTimes/allTotalAndAvgSleepTime",
+        type: "get",
+        dataType: "json",
+        async: false,
+        success: function (data) {
+            result = data.result;
+        },
+        error: function () {
+            alert("getAllTotalAndAvgSleepTime fail.");
+        }
+    });
+    return result;
+}
+

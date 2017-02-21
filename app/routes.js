@@ -94,7 +94,7 @@ module.exports = function (app) {
         Member.find(whereCondition.membersQuery, { //whereCondition Query
                 //設定 false 為不顯示該表格的的XX欄位
                 "__v": false,
-                
+
             })
             .then(function (members) {
                 let promiseArr = [];
@@ -146,10 +146,10 @@ module.exports = function (app) {
     //非根據上述的query查詢，是直接在url中改值
     //http://localhost:3000/sleepTimes/sum/sleepInTime
     app.get('/sleepTimes/:totalOrAvg/:totalSleepTimeOrSleepInTime', function (req, res) {
-        
+
         let totalOrAvg = req.params.totalOrAvg;
-        let totalSleepTimeOrSleepInTime = req.params.totalSleepTimeOrSleepInTime;        
-        
+        let totalSleepTimeOrSleepInTime = req.params.totalSleepTimeOrSleepInTime;
+
         let totalSleepTime = {};
         if (totalOrAvg == "sum") {
             totalSleepTime = {
@@ -193,17 +193,26 @@ module.exports = function (app) {
 
     });
 
-
+    //取得所有會員的加總、平均的睡眠時間和賴床時間
+    //http://localhost:3000/sleepTimes/allTotalAndAvgSleepTime
     app.get('/sleepTimes/allTotalAndAvgSleepTime', function (req, res) {
 
         SleepTime.aggregate(
            [{
                     "$group": {
                         "_id": "$member_Id",
-                        "sum_totalSleepTime": {"$sum":'$totalSleepTime'},
-                        "avg_totalSleepTime": {"$avg":'$totalSleepTime'},
-                        "sum_sleepInTime": {"$sum":'$sleepInTime'},
-                        "avg_sleepInTime": {"$avg":'$sleepInTime'},
+                        "sum_totalSleepTime": {
+                            "$sum": '$totalSleepTime'
+                        },
+                        "avg_totalSleepTime": {
+                            "$avg": '$totalSleepTime'
+                        },
+                        "sum_sleepInTime": {
+                            "$sum": '$sleepInTime'
+                        },
+                        "avg_sleepInTime": {
+                            "$avg": '$sleepInTime'
+                        },
                     }
             }]
             )
@@ -229,8 +238,8 @@ module.exports = function (app) {
                 });
             });
     });
-    
-    
+
+
     //取得睡眠資訊次數，例:全會員總共賴床或沒有賴床次數
     //http://localhost:3000/sleepTimesCount?isSleepIn=Y
     app.get('/sleepTimesCount', function (req, res) {
@@ -248,9 +257,6 @@ module.exports = function (app) {
             });
     });
 
-    
-    
-    
 
     //取得全會員總共賴床次數 >地形圖顯示所有資訊
     //query: 當url中存在/member?no=XXX ，使用req.query.no才取的到值
@@ -269,7 +275,9 @@ module.exports = function (app) {
             });
     });
 
-    app.get('/findTaipeiMembersHasSleepIn', function (req, res) {
+    
+    
+    app.get('/test', function (req, res) {
         SleepTime.find({
             isSleepIn: 'Y',
             //totalSleepTime:3858291,
@@ -293,7 +301,7 @@ module.exports = function (app) {
         });
     });
 
-    app.get('/test', function (req, res) {
+    app.get('/test2', function (req, res) {
         var resultArray = [];
         var resultObject = {};
         Member.find({
@@ -325,7 +333,7 @@ module.exports = function (app) {
         });
     });
 
-    app.get('/test2', function (req, res) {
+    app.get('/test3', function (req, res) {
         Member.find({
                 address: '台東縣',
                 _id: "589db96ea893f829d88fc321",
@@ -361,60 +369,6 @@ module.exports = function (app) {
 
     });
 
-    /*
-    app.get('/test', function (req, res) {
-        var resultArray = [];
-        var resultObject = {};
-        
-        Member.find({
-            address: '台北市',
-            //_id : '588396f580d09b0e2869d454',
-        }, function (error, members) {
-            //每個會員再藉由PK(_id)去查詢關聯SleepTime中的memberId
-
-            members.forEach(function (member) {
-                resultObject = member;
-                resultObject.sleepTimes = [];
-                //console.log('member._id:' + member._id);
-
-                SleepTime.find({
-                    memberId: member._id,
-                }, function (error, sleepTimes) {
-                    resultObject.sleepTimes = sleepTimes;
-                    console.log('resultObject.sleepTimes : ' + resultObject.sleepTimes);
-                });
-
-                resultArray.push(resultObject);
-            });
-            if (error) {
-                return res.status(500)
-            }
-            res.json({
-                result: resultArray,
-            });
-        });
-        
-
-        
-        Member.find({ 
-            //address : '台北市'
-            _id : '588396f580d09b0e2869d454',
-        })
-        .populate({path: 'sleepTimes', select: {memberId: '588396f580d09b0e2869d454'}})
-        .exec(function(error, member){
-            console.log(member);
-            if(error) {
-                return res.status(500)
-            }
-            res.json({
-                members: member,
-            });
-        });
-        
-        
-       
-    }
-    */
     function removeEmptyQuery(params) {
         //let multiQueryArray = [];
         for (var paramProperty in params) {
