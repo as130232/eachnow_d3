@@ -12,7 +12,6 @@ function dateToRangeMillisecond(dateStr) {
     let result = '$gte' + rangeOfStart + ',' + '$lte' + rangeOfEnd;
     console.log('result', result);
     return result;
-
 }
 
 function hourToMillisecond(hour) {
