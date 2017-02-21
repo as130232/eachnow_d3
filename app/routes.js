@@ -93,6 +93,7 @@ module.exports = function (app) {
         Member.find(whereCondition.membersQuery, { //whereCondition Query
                 //設定 false 為不顯示該表格的的XX欄位
                 "__v": false,
+                
             })
             .then(function (members) {
                 let promiseArr = [];
@@ -124,7 +125,6 @@ module.exports = function (app) {
             });
     });
 
-
     //sleepTimes的複合查詢(不包含會員)
     app.get('/sleeptimes', function (req, res) {
         let params = removeEmptyQuery(req.query);
@@ -145,9 +145,10 @@ module.exports = function (app) {
     //非根據上述的query查詢，是直接在url中改值
     //http://localhost:3000/sleepTimes/sum/sleepInTime
     app.get('/sleepTimes/:totalOrAvg/:totalSleepTimeOrSleepInTime', function (req, res) {
+        
         let totalOrAvg = req.params.totalOrAvg;
-        let totalSleepTimeOrSleepInTime = req.params.totalSleepTimeOrSleepInTime;
-
+        let totalSleepTimeOrSleepInTime = req.params.totalSleepTimeOrSleepInTime;        
+        
         let totalSleepTime = {};
         if (totalOrAvg == "sum") {
             totalSleepTime = {
@@ -209,6 +210,8 @@ module.exports = function (app) {
             });
     });
 
+    
+    
     
 
     //取得全會員總共賴床次數 >地形圖顯示所有資訊

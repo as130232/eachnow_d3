@@ -350,7 +350,7 @@ window.onload = function () {
             .range([heightPlusBottomMarg - startY, 0])
 
 
-
+        //設定所有長條圖的屬性
         var statsData = [{
                 x: startX,
                 y: yPosScale(categories[0].data.length),
@@ -427,7 +427,8 @@ window.onload = function () {
             .attr('fill', 'black')
             .style("font-family", "微軟正黑體")
             .style("font-size", "16pt");
-
+        
+        //增加天數格子移動特效，並增加數據、文字敘述屬性
         addTemporaryDayAndMoveTo(barLables, function (maxDur) {
 
             var counter = 0;
@@ -465,12 +466,12 @@ window.onload = function () {
         });
 
 
-
+        //新增動畫效果
         function addTemporaryDayAndMoveTo(barLables, moveCallback) {
             var positions = [];
             //http://stackoverflow.com/questions/6858479/rectangle-coordinates-after-transform
             yearView.selectAll('rect').each(function (d) {
-
+                //設定起始點 為各天數格子的 x, y 
                 var pos = getRelPos(this, svg);
 
                 pos.cx = pos.x + (dayWidth / 2);
@@ -546,7 +547,9 @@ window.onload = function () {
 
                     return dur;
                 })
-                //.ease(d3.easeQuadIn)
+                //easeQuadIn特效
+                .ease(d3.easeQuadIn)
+                
                 .on('end', function () {
                     //counter++
                     //if(!counter === positions.length) {
@@ -560,7 +563,7 @@ window.onload = function () {
         }
 
 
-        //Helper functions
+        //判定是否為假日
         function isWeekDay(num) {
             var o = {
                 0: false,
