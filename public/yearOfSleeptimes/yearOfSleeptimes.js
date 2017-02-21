@@ -549,7 +549,7 @@ function drawSvgForYearOfSleeptimes(result) {
     }
 
 
-    //Helper functions
+    //判定是否為假日
     function isWeekDay(num) {
         var o = {
             0: false,

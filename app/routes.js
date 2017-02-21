@@ -194,6 +194,43 @@ module.exports = function (app) {
     });
 
 
+    app.get('/sleepTimes/allTotalAndAvgSleepTime', function (req, res) {
+
+        SleepTime.aggregate(
+           [{
+                    "$group": {
+                        "_id": "$member_Id",
+                        "sum_totalSleepTime": {"$sum":'$totalSleepTime'},
+                        "avg_totalSleepTime": {"$avg":'$totalSleepTime'},
+                        "sum_sleepInTime": {"$sum":'$sleepInTime'},
+                        "avg_sleepInTime": {"$avg":'$sleepInTime'},
+                    }
+            }]
+            )
+            .then(function (sleeptimes) {
+                let promiseArr = [];
+                sleeptimes.forEach(function (sleeptime) {
+                    sleeptime.member = {};
+                    promiseArr.push(Member.find(sleeptime._id, { //whereQuery.sleepTimesQuery為塞選條件
+                            "_id": false,
+                            "__v": false,
+                            "sleepTimes": false,
+                        })
+                        .then(function (member) {
+                            sleeptime.member = member;
+                            return sleeptime;
+                        }));
+                });
+                return Promise.all(promiseArr);
+            })
+            .then(function (result) {
+                res.json({
+                    result: result,
+                });
+            });
+    });
+    
+    
     //取得睡眠資訊次數，例:全會員總共賴床或沒有賴床次數
     //http://localhost:3000/sleepTimesCount?isSleepIn=Y
     app.get('/sleepTimesCount', function (req, res) {
