@@ -19,6 +19,8 @@ function init() {
             whereCondition.secondStructure = secondStructureSelect;
 
             drawBubbleChart(whereCondition);
+
+            d3.select("#tool2p").classed("hidden", false);
         }
 
     }
@@ -39,6 +41,7 @@ function init() {
     $("#statusSelect").on("change", function () {
         setAllQuerySelectValue();
     });
+
 }
 
 
@@ -95,20 +98,20 @@ function drawBubbleChart(whereCondition) {
     }
 
     function bind(dataSet, whereCondition) {
-        
+
         //d3.nest() 將資料結構(巢狀)化，區分為key value
         let nestedDataSet = d3.nest()
             //先按照職業區分
             .key(function (data) {
                 let result = judgeStructure(data, whereCondition.firstStructure);
-                return result;  
+                return result;
                 //return data.member[0][whereCondition.firstStructure]
             })
             //.sortValues(d3.descending)
             //在按照性別劃分
             .key(function (data) {
                 let result = judgeStructure(data, whereCondition.secondStructure);
-                return result;  
+                return result;
                 //return data.member[0][whereCondition.secondStructure];
             })
             //entries : 資料來源
@@ -153,8 +156,8 @@ function drawBubbleChart(whereCondition) {
             .data(packed_dataSet);
         selection.enter().append("circle");
         selection.exit().remove();
-        
-        
+
+
         //檢測結構化資料
         function judgeStructure(data, structure) {
             ////若是年齡，key每十年為一單位，ex:1983 → 1980，無條件捨去
@@ -215,7 +218,10 @@ function drawBubbleChart(whereCondition) {
                 originalColor = d3.select(this).attr("fill");
                 d3.select(this).attr({
                     fill: "#00FA9A",
+                    opacity: 0.5,
                 })
+                showDiagram(data);
+
             })
             .on("mouseout", function (data) {
                 d3.select(this).attr({
@@ -224,8 +230,115 @@ function drawBubbleChart(whereCondition) {
             })
             .on("click", function (data) {
                 console.log(data);
-                d3.select("svg").selectAll("circle")
+
+                d3.select("svg").selectAll("circle").remove("mouseover");
+
             });
 
+
+        function showDiagram(data) {
+            d3.select("#diagram").classed("hidden", false);
+            $("#diagram .title").empty();
+            $("#diagram .content").empty();
+            d3.select("#diagram2").classed("hidden", false);
+            $("#diagram2 .title").empty();
+            $("#diagram2 .content").empty();
+
+            let firstStructureText = $("#aggregateSelect option:selected").text();
+            let secondStructureText = $("#statusSelect option:selected").text();
+
+
+            if (data.hasOwnProperty("key")) {
+                d3.select("#diagram .title").append("text")
+                    .text('群組: ' + data.key)
+                    .style({
+                        "color": "#fff",
+                        "font-size": "40px",
+                        "font-family": "Microsoft JhengHei",
+                    });
+            } else {
+                d3.select("#diagram .title").append("text")
+                    .text("會員: " + data.member[0].name)
+                    .style({
+                        "color": "#fff",
+                        "font-size": "40px",
+                        "font-family": "Microsoft JhengHei",
+                    });
+            }
+            let sleepTime = Math.floor((data.value) / 1000);
+            let aggregateSelectText = $("#aggregateSelect option:selected").text();
+            let statusSelectText = $("#statusSelect option:selected").text();
+
+            $("#diagram .content").append(aggregateSelectText + " " + statusSelectText + " : " + sleepTime + "秒<br>　＝　" + (sleepTime / 60).toFixed(1) + "分<br>　＝　" + (sleepTime / 3600).toFixed(2) + "小時");
+
+            //set data
+            $("#diagram").data("sleeptime", sleepTime);
+
+            //單位換算
+            d3.select("#diagram2 .title").append("text")
+                .text("單位換算　")
+                .style({
+                    "color": "#fff",
+                    "font-size": "40px",
+                    "font-family": "Microsoft JhengHei",
+                });
+
+            var conversionSelect = $("<select/>", {
+                id: "conversionSelect"
+            });
+
+            //單位(秒)
+            conversionSelect.append('<option value="">--請選擇--</option>' +
+                '<option value="7000" name="move">電影</option>' +
+                '<option value="100800" name="keP">柯P雙塔</option>' +
+                '<option value="300" name="instantNoodles">泡泡麵</option>' +
+                '<option value="3600" name="d3Class">D3課程</option>' +
+                '<option value="30" name="english">背英文單字</option>' +
+                '<option value="2820" name="bannanLine">頂埔到南港</option>' +
+                '<option value="2592000" name="born">出生</option>');
+            $("#diagram2 .title").append(conversionSelect);
+
+            $("#diagram2 .content").append("約等於..<br>");
+
+            $("#conversionSelect").on("change", function () {
+                $("#diagram2 .content").empty();
+                $("#diagram2 .content").append("約等於..<br>");
+                let value = $(this).val();
+                let name = $("#conversionSelect option:selected").attr('name');
+                let sleeptimes = $("#diagram").data("sleeptime");
+
+                let conversionValue = (sleeptimes / value).toFixed(2);
+
+                conversionValue = '<span id="conversionValue">' + conversionValue + '</span>';
+                let result;
+
+                switch (name) {
+                case "move":
+                    result = "觀賞 " + conversionValue + " 部電影(2.5時)";
+                    break;
+                case "keP":
+                    result = "柯P騎了 " + conversionValue + " 趟<br>一日雙塔(28時)";
+                    break;
+                case "instantNoodles":
+                    result = "泡了 " + conversionValue + " 碗<br>微粒炸醬麵(5分)";
+                    break;
+                case "d3Class":
+                    result = "上了 " + conversionValue + " 堂<br>充實的D3課程(1時)";
+                    break;
+                case "english":
+                    result = "背了 " + conversionValue + " 個<br>英文單字(30秒)";
+                    break;
+                case "bannanLine":
+                    result = "共 " + conversionValue + " 趟<br>從從頂埔到南港(47分)";
+                    break;
+                case "born":
+                    result = "已 " + conversionValue + " 月大的嬰兒";
+                    break;        
+                }
+                $("#diagram2 .content").append(result);
+            });
+        }
+
     }
+
 }

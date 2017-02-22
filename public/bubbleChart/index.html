@@ -44,9 +44,9 @@
                     <option value="job">職業</option>
                     <option value="address">居住地</option>
                 </select>
-                
+
                 <p></p>
-                
+
                 <select id="aggregateSelect">
                     <option value="">---請選擇---</option>
                     <option value="sum">加總</option>
@@ -65,19 +65,54 @@
 
             </div>
             <div class="col-lg-4">
-                <div class="hero-unit">
-                    <h1>
-					Hello, world!
-				</h1>
-                    <p>
-                        这是一个可视化布局模板, 你可以点击模板里的文字进行修改, 也可以通过点击弹出的编辑框进行富文本修改. 拖动区块能实现排序.
-                    </p>
-                    <p>
-                        <a class="btn btn-primary btn-large" href="#">参看更多 »</a>
-                    </p>
+                <div id="diagram" class="hidden">
+                    <center><p class="title"></p></center>
+                    <p class="content"></p>
                 </div>
+                <p></p>
+
+                <div id="diagram2" class="hidden">
+                    <center><p class="title"></p></center>
+                    <p class="content"></p>
+                </div>
+
             </div>
         </div>
+
+        <style>
+            #diagram,
+            #diagram2 {
+                position: absolute;
+                left: 50px;
+                top: 50px;
+                background: #79C043;
+                width: 450px;
+                height: auto;
+                padding: 0px 10px;
+                border-radius: 10px;
+                box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+                font-family: "Microsoft JhengHei";
+            }
+            #diagram2 {
+                top: 350px;
+            }
+            #diagram.hidden,
+            #diagram2.hidden {
+                display: none;
+            }
+            
+            .content {
+                font-family: "Microsoft JhengHei";
+                font-size: 30px;
+                color: #fff;
+                
+            }
+            
+            #conversionValue{
+                font-size: 40px;
+                color: #FF1493;
+            }
+        </style>
     </div>
 
 
