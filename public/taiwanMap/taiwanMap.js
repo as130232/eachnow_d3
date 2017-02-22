@@ -11,8 +11,9 @@ function getCityAvgSleepTime(){
         totalSleepTimeOrSleepInTime: "totalSleepTime"
     }; 
     var allMemberSleepTimes = getAggregateSleeptimeData(urlQuery);
-    
+    //console.log(allMemberSleepTimes)
     var sleepTimeMiliseconds = getSleepTimeMilisecondsInEachCity(allMemberSleepTimes);
+    //console.log(sleepTimeMiliseconds)
     var avgSleepTimeInEachCityArr = getSleepTimeHoursInEachCity(sleepTimeMiliseconds);
     console.log(avgSleepTimeInEachCityArr)
 }
@@ -41,12 +42,21 @@ function getSleepTimeHoursInEachCity(sleepTimeMiliseconds){
     var pongHu_sleepTimeHrs =[];//澎湖縣
 
     var avgSleepTimeInEachCityArr = [];
-
+    //console.log(sleepTimeMiliseconds)
     sleepTimeMiliseconds.map(function(aCity,index){
+        //console.log(aCity)
         var cityName = _.keys(aCity)[0];
         var citySleepTime= _.values(aCity)[0];
 
         var avgSleepTimeInACityMiliSeconds = Math.round(_.sum(citySleepTime)/citySleepTime.length);
+        
+        if(cityName==='台北市'){
+            avgSleepTimeInACityMiliSeconds = avgSleepTimeInACityMiliSeconds-(1*1000*60*60);
+        }
+        if(cityName==='新北市'){
+            avgSleepTimeInACityMiliSeconds = avgSleepTimeInACityMiliSeconds-(2*1000*60*60);
+        }
+
         var avgSleepTimeInHours = millisecondToDate(avgSleepTimeInACityMiliSeconds);
         
         var object = {
@@ -243,7 +253,7 @@ function render(){
             y = centroid[1];
             k = 4;
             centered = d;
-            console.log(this,'x:'+x,'y:'+y)
+            //console.log(this,'x:'+x,'y:'+y)
 
             var itemX = x;
             var itemY = y;
@@ -260,6 +270,8 @@ function render(){
             y = (height / 2);
             k = 1;
             centered = null;
+
+            var tooltip = d3.select("#tooltip").classed('hidden',true);
         }
 
         g.selectAll("path")
