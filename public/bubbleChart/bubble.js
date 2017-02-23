@@ -1,53 +1,87 @@
 //大圈:行業別 - 城市別 - 男女別
 
-init();
+window.onload = init;
 
 function init() {
-    let allMembersSleepTimesCountData = getAllMembersSleepTimesCountData();
-
-    let urlQuery = {};
-    urlQuery.totalOrAvg = "sum";
-    urlQuery.totalSleepTimeOrSleepInTime = "totalSleepTime";
-    let sum_totalSleepTime_data = getAggregateSleeptimeData(urlQuery);
-
-    urlQuery.totalSleepTimeOrSleepInTime = "sleepInTime";
-    let sum_sleepInTime_data = getAggregateSleeptimeData(urlQuery);
-
-    urlQuery.totalOrAvg = "avg";
-    let avg_sleepInTime_data = getAggregateSleeptimeData(urlQuery);
-    let avg_totalSleepTime_data = getAggregateSleeptimeData(urlQuery);
 
 
-    drawBubbleChart();
+    function setAllQuerySelectValue() {
+        let whereCondition = {};
+        let firstStructureSelect = $("#firstStructureSelect").val();
+        let secondStructureSelect = $("#secondStructureSelect").val();
+        let aggregateType = $("#aggregateSelect").val();
+        let statusType = $("#statusSelect").val();
+        //必須滿足都要有值才可以組成whereCondition，並送出查詢畫出泡泡圖
+        if (aggregateType && statusType && firstStructureSelect && secondStructureSelect) {
+            let whereCondition = {};
+            whereCondition.aggregateType = aggregateType + "_" + statusType;
+            whereCondition.firstStructure = firstStructureSelect;
+            whereCondition.secondStructure = secondStructureSelect;
+
+            drawBubbleChart(whereCondition);
+
+            d3.select("#tool2p").classed("hidden", false);
+        }
+
+    }
+
+    //drawBubbleChart();
+    $("#firstStructureSelect").on("change", function () {
+        setAllQuerySelectValue();
+    });
+
+    $("#secondStructureSelect").on("change", function () {
+        setAllQuerySelectValue();
+    });
+
+    $("#aggregateSelect").on("change", function () {
+        setAllQuerySelectValue();
+    });
+
+    $("#statusSelect").on("change", function () {
+        setAllQuerySelectValue();
+    });
+
 }
 
-function drawBubbleChart() {
+
+
+function drawBubbleChart(whereCondition) {
+    // clear old svg.
+    $("#bubbleChart svg").remove();
+
     let bubbleChartSvg = {};
-    bubbleChartSvg.width = 1200;
-    bubbleChartSvg.height = 800;
+    bubbleChartSvg.width = document.getElementById('bubbleChart').clientWidth;
+    bubbleChartSvg.height = 800; //document.getElementById('bubbleChart').clientHeight;
 
     var padding = 90;
 
 
     createSvg();
 
-    d3.csv("hw03_invoice-taipei.csv", row, function (dataSet) {
+    //所有會員賴床次數
+    let allMembersSleepTimesCountData = getAllMembersSleepTimesCountData();
 
-        //console.table(dataSet);
-        bind(dataSet);
-        render(dataSet);
+    let allMembersAndSleepTimes = getAllTotalAndAvgSleepTime();
 
-    });
+    allMembersAndSleepTimes = convertInt(allMembersAndSleepTimes, whereCondition);
+
+    bind(allMembersAndSleepTimes, whereCondition);
+    render(allMembersAndSleepTimes);
+
+
+
     //先做轉圖型
-    function row(d) {
-        //TODO-1.轉換資料型態，提示：三行
-        d.amount = +d.amount;
-        d.number = +d.number;
+    function convertInt(dataArray, whereCondition) {
+        //var whereCondition = "sum_totalSleepTime";
 
-        //???依據何種資訊來綁定泡泡的大小視覺圖型
-        //自行設定每筆資料物件多 value的屬性，其值定義為 amount
-        d.value = +d.amount;
-        return d;
+        dataArray.forEach(function (data) {
+            //自行設定每筆資料物件多 value的屬性，其值定義根據前端user選擇
+            data.value = data[whereCondition.aggregateType];
+        });
+
+
+        return dataArray;
     }
 
     function createSvg() {
@@ -63,63 +97,47 @@ function drawBubbleChart() {
 
     }
 
-    function bind(dataSet) {
-        //一開始先將資料過濾(篩選出只想要的資料)ex:2016/8/1
-        let filtered_dataSet = dataSet.filter(function (data) {
-            return data.date === "2016/8/1";
-        })
+    function bind(dataSet, whereCondition) {
 
         //d3.nest() 將資料結構(巢狀)化，區分為key value
-        var nested_dataSet = d3.nest()
-            //設定key 依據何種資料來劃分，類似Sql中的group
-            .key(function (d) {
-                return d.industry;
+        let nestedDataSet = d3.nest()
+            //先按照職業區分
+            .key(function (data) {
+                let result = judgeStructure(data, whereCondition.firstStructure);
+                return result;
+                //return data.member[0][whereCondition.firstStructure]
             })
-
-        /*
-            額外補充，可以針對分類完的group資料
-            做彙整或排序等
-        */
-
-        //彙整:可回傳根據key(industry) 分類group的群組底下有幾個元素
-        //            .rollup(function (d){
-        //                return +d.length;     //回傳該子結構(陣列)的長度
-        //            })
-
-        //根據key來做排序
-        //.sortKeys(d3.descending)
-
-        //根據value來做排序
-        //.sortValues(d3.descending)
-
-        //???2.TODO-再依城市劃分，
-        //子結構底下再劃分孫子結構(先根據行業區分，再區分各城市別)
-        .key(function (d) {
-                return d.city;
+            //.sortValues(d3.descending)
+            //在按照性別劃分
+            .key(function (data) {
+                let result = judgeStructure(data, whereCondition.secondStructure);
+                return result;
+                //return data.member[0][whereCondition.secondStructure];
             })
-            .entries(filtered_dataSet); //entries : 資料來源
+            //entries : 資料來源
+            .entries(dataSet);
 
-        console.log(nested_dataSet);
-
+        //多包一層Key Vaule(d3.node())需要的資料格式
         var root = {
-            values: nested_dataSet
+            values: nestedDataSet
         };
 
 
+
         var packed_dataSet = d3.layout.pack()
-            .size([bubbleChartSvg.width, h])
+            .size([bubbleChartSvg.width, bubbleChartSvg.height])
             .padding(2)
-            //???TODO-5.依大小排序，目標:大內外小
             //升序 由小排到大 d3.ascending(a, b);
             //降序 由大排到小 d3.descending(a, b);
             .sort(function (a, b) {
                 //原本內圈有小圓逆時針到外圈大圓
                 //藉由排序將顯示顛倒過來
-                return d3.descending(a.value, b.value);
+
+                //由user下拉選單的條件作排序
+                return d3.descending(a[whereCondition.aggregateType], b[whereCondition.aggregateType]);
                 //return d3.ascending(a.number, b.number);
             })
             .children(
-                //???TODO-3.<問>要回傳什麼？
                 function (data) {
                     //回傳key(group)對應的vaules (資料的子結構)
                     return data.values;
@@ -127,10 +145,7 @@ function drawBubbleChart() {
             )
             .nodes(root); //nodes:節點下需要的 root巢狀化資料
 
-        //console.log(packed_dataSet);
-
-        //???TODO-6.如何把最外的大圓去掉？
-        //只有第一筆資料沒有parent，為最外層最大顆的圓
+        //只有第一筆資料沒有parent，為最外層最大顆的圓，去除掉
         packed_dataSet = packed_dataSet.filter(function (data) {
             //過濾是否有parent欄位
             return data.parent;
@@ -141,6 +156,29 @@ function drawBubbleChart() {
             .data(packed_dataSet);
         selection.enter().append("circle");
         selection.exit().remove();
+
+
+        //檢測結構化資料
+        function judgeStructure(data, structure) {
+            ////若是年齡，key每十年為一單位，ex:1983 → 1980，無條件捨去
+            if ((structure.toString()) == "birth") {
+                let dateStr = data.member[0][structure];
+                let result = takeToTenDigitsFromDateStr(dateStr);
+                return result;
+            } else {
+                //回傳一般屬性
+                return data.member[0][structure];
+            }
+        }
+
+        function takeToTenDigitsFromDateStr(dateStr) {
+            let year = (new Date(dateStr)).getFullYear();
+            //let year = date.getFullYear();
+            let roundYear = (Math.floor(year / 10)) * 10;
+            let addTenYear = roundYear + 10 - 1;
+            return roundYear + " - " + addTenYear;
+        }
+
     }
 
     function render(dataSet) {
@@ -159,14 +197,12 @@ function drawBubbleChart() {
                     return d.r;
                 }, // 用 r 當半徑
                 //fill: "#eee", 
-                //???TODO-4.依行業別填不同色 
                 fill: function (data) {
-                    //console.log(data);
-                    //找尋此物件是否有industry此參數，若沒有表示為自行建構出來的群組
-                    //將群組分類(非本身資料，只是分類結構)移去
+                    //找尋此物件是否有member屬性，若沒有表示為自行建構出來的群組
+                    //將此群組分類(非本身資料，只是分類結構)移去
                     //(非本身資料，不需要將此最外圈的群組(圓)上色)
-                    if (data.hasOwnProperty("industry")) {
-                        return fScale(data.industry);
+                    if (data.hasOwnProperty("member")) {
+                        return fScale(data.member[0].job);
                     } else {
                         return "#eee";
                     }
@@ -181,8 +217,11 @@ function drawBubbleChart() {
             .on("mouseover", function (data) {
                 originalColor = d3.select(this).attr("fill");
                 d3.select(this).attr({
-                    fill: "gold",
+                    fill: "#00FA9A",
+                    opacity: 0.5,
                 })
+                showDiagram(data);
+
             })
             .on("mouseout", function (data) {
                 d3.select(this).attr({
@@ -191,8 +230,115 @@ function drawBubbleChart() {
             })
             .on("click", function (data) {
                 console.log(data);
-                d3.select("svg").selectAll("circle")
+
+                d3.select("svg").selectAll("circle").remove("mouseover");
+
             });
 
+
+        function showDiagram(data) {
+            d3.select("#diagram").classed("hidden", false);
+            $("#diagram .title").empty();
+            $("#diagram .content").empty();
+            d3.select("#diagram2").classed("hidden", false);
+            $("#diagram2 .title").empty();
+            $("#diagram2 .content").empty();
+
+            let firstStructureText = $("#aggregateSelect option:selected").text();
+            let secondStructureText = $("#statusSelect option:selected").text();
+
+
+            if (data.hasOwnProperty("key")) {
+                d3.select("#diagram .title").append("text")
+                    .text('群組: ' + data.key)
+                    .style({
+                        "color": "#fff",
+                        "font-size": "40px",
+                        "font-family": "Microsoft JhengHei",
+                    });
+            } else {
+                d3.select("#diagram .title").append("text")
+                    .text("會員: " + data.member[0].name)
+                    .style({
+                        "color": "#fff",
+                        "font-size": "40px",
+                        "font-family": "Microsoft JhengHei",
+                    });
+            }
+            let sleepTime = Math.floor((data.value) / 1000);
+            let aggregateSelectText = $("#aggregateSelect option:selected").text();
+            let statusSelectText = $("#statusSelect option:selected").text();
+
+            $("#diagram .content").append(aggregateSelectText + " " + statusSelectText + " : " + sleepTime + "秒<br>　＝　" + (sleepTime / 60).toFixed(1) + "分<br>　＝　" + (sleepTime / 3600).toFixed(2) + "小時");
+
+            //set data
+            $("#diagram").data("sleeptime", sleepTime);
+
+            //單位換算
+            d3.select("#diagram2 .title").append("text")
+                .text("單位換算　")
+                .style({
+                    "color": "#fff",
+                    "font-size": "40px",
+                    "font-family": "Microsoft JhengHei",
+                });
+
+            var conversionSelect = $("<select/>", {
+                id: "conversionSelect"
+            });
+
+            //單位(秒)
+            conversionSelect.append('<option value="">--請選擇--</option>' +
+                '<option value="7000" name="move">電影</option>' +
+                '<option value="100800" name="keP">柯P雙塔</option>' +
+                '<option value="300" name="instantNoodles">泡泡麵</option>' +
+                '<option value="3600" name="d3Class">D3課程</option>' +
+                '<option value="30" name="english">背英文單字</option>' +
+                '<option value="2820" name="bannanLine">頂埔到南港</option>' +
+                '<option value="2592000" name="born">出生</option>');
+            $("#diagram2 .title").append(conversionSelect);
+
+            $("#diagram2 .content").append("約等於..<br>");
+
+            $("#conversionSelect").on("change", function () {
+                $("#diagram2 .content").empty();
+                $("#diagram2 .content").append("約等於..<br>");
+                let value = $(this).val();
+                let name = $("#conversionSelect option:selected").attr('name');
+                let sleeptimes = $("#diagram").data("sleeptime");
+
+                let conversionValue = (sleeptimes / value).toFixed(2);
+
+                conversionValue = '<span id="conversionValue">' + conversionValue + '</span>';
+                let result;
+
+                switch (name) {
+                case "move":
+                    result = "觀賞 " + conversionValue + " 部電影(2.5時)";
+                    break;
+                case "keP":
+                    result = "柯P騎了 " + conversionValue + " 趟<br>一日雙塔(28時)";
+                    break;
+                case "instantNoodles":
+                    result = "泡了 " + conversionValue + " 碗<br>微粒炸醬麵(5分)";
+                    break;
+                case "d3Class":
+                    result = "上了 " + conversionValue + " 堂<br>充實的D3課程(1時)";
+                    break;
+                case "english":
+                    result = "背了 " + conversionValue + " 個<br>英文單字(30秒)";
+                    break;
+                case "bannanLine":
+                    result = "共 " + conversionValue + " 趟<br>從從頂埔到南港(47分)";
+                    break;
+                case "born":
+                    result = "已 " + conversionValue + " 月大的嬰兒";
+                    break;        
+                }
+                $("#diagram2 .content").append(result);
+            });
+        }
+
     }
+
 }

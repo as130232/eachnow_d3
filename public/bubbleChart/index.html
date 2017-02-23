@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Untitled Document</title>
+    <title>Document</title>
+    <!--  "/"為public路徑底下，引入取得後端資料的js  -->
+    <link rel="stylesheet" href="/css/animate.css">
+    <!-- Icomoon Icon Fonts-->
+    <link rel="stylesheet" href="/css/icomoon.css">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <!-- Owl Carousel -->
+    <link rel="stylesheet" href="/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="/css/owl.theme.default.min.css">
+    <!-- Theme style  -->
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.0/d3.min.js"></script>-->
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="/getDataByAjax.js"></script>
+    <script type="text/javascript" src="/util.js"></script>
+    <script type="text/javascript" src="bubble.js"></script>
+
+
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="col-lg-12">
+                <select id="firstStructureSelect">
+                    <option value="">---第一層結構---</option>
+                    <option value="gender">性別</option>
+                    <option value="birth">年齡</option>
+                    <option value="job">職業</option>
+                    <option value="address">居住地</option>
+                </select>
+                <select id="secondStructureSelect">
+                    <option value="">---第二層結構---</option>
+                    <option value="gender">性別</option>
+                    <option value="birth">年齡</option>
+                    <option value="job">職業</option>
+                    <option value="address">居住地</option>
+                </select>
+
+                <p></p>
+
+                <select id="aggregateSelect">
+                    <option value="">---請選擇---</option>
+                    <option value="sum">加總</option>
+                    <option value="avg">平均</option>
+                </select>
+                <select id="statusSelect">
+                    <option value="">---請選擇---</option>
+                    <option value="totalSleepTime">睡眠時間</option>
+                    <option value="sleepInTime">賴床時間</option>
+                </select>
+
+            </div>
+        </div>
+        <div class="row-fluid">
+            <div class="col-lg-8" id="bubbleChart">
+
+            </div>
+            <div class="col-lg-4">
+                <div id="diagram" class="hidden">
+                    <center><p class="title"></p></center>
+                    <p class="content"></p>
+                </div>
+                <p></p>
+
+                <div id="diagram2" class="hidden">
+                    <center><p class="title"></p></center>
+                    <p class="content"></p>
+                </div>
+
+            </div>
+        </div>
+
+        <style>
+            #diagram,
+            #diagram2 {
+                position: absolute;
+                left: 50px;
+                top: 50px;
+                background: #79C043;
+                width: 450px;
+                height: auto;
+                padding: 0px 10px;
+                border-radius: 10px;
+                box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+                font-family: "Microsoft JhengHei";
+            }
+            #diagram2 {
+                top: 350px;
+            }
+            #diagram.hidden,
+            #diagram2.hidden {
+                display: none;
+            }
+            
+            .content {
+                font-family: "Microsoft JhengHei";
+                font-size: 30px;
+                color: #fff;
+                
+            }
+            
+            #conversionValue{
+                font-size: 40px;
+                color: #FF1493;
+            }
+        </style>
+    </div>
+
+
+
+</body>
+
+</html>
