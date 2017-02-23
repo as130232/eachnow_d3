@@ -7,8 +7,7 @@ class TaiwanMap {
     constructor(){
         this.getCityAvgSleepTime();
         this.getAvgSleepTimeByGenderInEachCity(sleepTimeAndMemberInEachCity);
-        this.renderMap();
-        
+        this.renderMap();      
     }
     getCityAvgSleepTime(){
         var totalAndAvgSleepTime = getAllTotalAndAvgSleepTime();
