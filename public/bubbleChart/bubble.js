@@ -430,6 +430,7 @@ function drawForceLayout(dataSet) {
                     "font-size": "40px",
                     "font-family": "Microsoft JhengHei",
                 });
+            
             $("#diagram .content").append("性別:" + data.member[0].gender + "<br>");
             $("#diagram .content").append("生日:" + data.member[0].birth + "<br>");
             $("#diagram .content").append("住址:" + data.member[0].address + "<br>");
