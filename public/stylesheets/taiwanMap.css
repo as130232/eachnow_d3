@@ -1,33 +1,34 @@
 /* line 1, ../../sass/taiwanMap.scss */
 #taiwanMap_div {
   height: 100%;
+  background-color: #42a6ec;
 }
-/* line 3, ../../sass/taiwanMap.scss */
+/* line 4, ../../sass/taiwanMap.scss */
 #taiwanMap_div .background {
   fill: none;
   pointer-events: all;
 }
-/* line 8, ../../sass/taiwanMap.scss */
+/* line 9, ../../sass/taiwanMap.scss */
 #taiwanMap_div .noData {
   fill: #aaa;
 }
-/* line 12, ../../sass/taiwanMap.scss */
+/* line 13, ../../sass/taiwanMap.scss */
 #taiwanMap_div .active {
   fill: yellow;
 }
-/* line 16, ../../sass/taiwanMap.scss */
+/* line 17, ../../sass/taiwanMap.scss */
 #taiwanMap_div .six_hr {
   fill: red;
 }
-/* line 20, ../../sass/taiwanMap.scss */
+/* line 21, ../../sass/taiwanMap.scss */
 #taiwanMap_div .seven_hr {
   fill: orangered;
 }
-/* line 24, ../../sass/taiwanMap.scss */
+/* line 25, ../../sass/taiwanMap.scss */
 #taiwanMap_div .eight_hr {
   fill: green;
 }
-/* line 28, ../../sass/taiwanMap.scss */
+/* line 29, ../../sass/taiwanMap.scss */
 #taiwanMap_div #borders {
   fill: none;
   stroke: #fff;
@@ -36,17 +37,17 @@
   stroke-linecap: round;
   pointer-events: none;
 }
-/* line 36, ../../sass/taiwanMap.scss */
+/* line 37, ../../sass/taiwanMap.scss */
 #taiwanMap_div #tooltip {
   position: absolute;
   background: #fff;
-  width: 150px;
+  width: 250px;
   height: auto;
   padding: 0px 10px;
   border-radius: 10px;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
 }
-/* line 46, ../../sass/taiwanMap.scss */
+/* line 47, ../../sass/taiwanMap.scss */
 #taiwanMap_div #tooltip.hidden {
   display: none;
 }

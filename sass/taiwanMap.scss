@@ -1,5 +1,6 @@
 #taiwanMap_div{
     height: 100%;
+    background-color: #42a6ec;
     .background {
         fill: none;
         pointer-events: all;
@@ -36,7 +37,7 @@
     #tooltip{
         position: absolute;
         background: #fff;
-        width: 150px;
+        width: 250px;
         height: auto;
         padding: 0px 10px;
         border-radius: 10px;
