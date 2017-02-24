@@ -1,11 +1,81 @@
-<div id="bubbleChart">泡泡圖</div>
-
 <!-- D3 -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.0/d3.min.js"></script>
-
-<div id="barChart_div">
+<!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.0/d3.min.js"></script>-->
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<div id="bubbleChart_div">
     <div class="container">
-        <div id="bubbleChart">泡泡圖</div>
+        <div class="row">
+            <div class="col-lg-12" id="selectDiv">
+                <div class="col-lg-4 selectOption">
+                    <select id="firstStructureSelect" class="form-control">
+                        <option value="">---第一層結構---</option>
+                        <option value="gender">性別</option>
+                        <option value="birth">年齡</option>
+                        <option value="job">職業</option>
+                        <option value="address">居住地</option>
+                    </select>
+                    <select id="secondStructureSelect" class="form-control">
+                        <option value="">---第二層結構---</option>
+                        <option value="gender">性別</option>
+                        <option value="birth">年齡</option>
+                        <option value="job">職業</option>
+                        <option value="address">居住地</option>
+                    </select>
+                </div>
+                <div class="col-lg-6 radioBtns">
+                    <div class="radio">
+                        <label for="sum">
+                            <div class="iradio_minimal"> 
+                                <input type="radio" value="sum" id="sum" name="aggregate">
+                            </div>
+                            加總 
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label for="avg">
+                            <div class="iradio_minimal"> 
+                                <input type="radio" value="avg" id="avg" name="aggregate">
+                            </div>
+                            平均
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label for="totalSleepTime">
+                            <div class="iradio_minimal"> 
+                                <input type="radio" value="totalSleepTime" id="totalSleepTime" name="status">
+                            </div>
+                            睡眠時間
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label for="sleepInTime">
+                            <div class="iradio_minimal"> 
+                                <input type="radio" value="sleepInTime" id="sleepInTime" name="status">
+                            </div>  
+                            賴床時間      
+                        </label>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <button id="drawForceLayoutBtn" class="btn btn-info"><font face="微軟正黑體">查詢全會員</font></button>         
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8" id="bubbleChart"></div>
+            <div class="col-lg-4">
+            <div id="diagram" class="hidden">
+                <center>
+                    <span class="title"></span>
+                </center>
+                <span class="content"></span>
+            </div>
+            <div id="diagram2" class="hidden">
+                <center>
+                    <span class="title"></span>
+                </center>
+                <span class="content"></span>
+            </div>
+        </div>
     </div>
 </div>
 

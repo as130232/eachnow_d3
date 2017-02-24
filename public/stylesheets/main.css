@@ -13,4 +13,5 @@ html body #fh5co-page {
 /* line 7, ../../sass/main.scss */
 html body #fh5co-page #fh5co-main {
   height: 100%;
+  overflow: auto;
 }

@@ -1,18 +1,9 @@
 //大圈:行業別 - 城市別 - 男女別
 
-window.onload = init;
+init();
 
-function init() {
-
-    d3.select("body").append("svg")
-        .attr({
-            width: 900,
-            height: 400,
-        })
-        .append('g')
-        .append("rect");
-
-
+function init(){
+    
     function setAllQuerySelectValue() {
         let whereCondition = {};
         let firstStructureSelect = $("#firstStructureSelect").val();
@@ -65,10 +56,9 @@ function drawBubbleChart(whereCondition) {
 
     let bubbleChartSvg = {};
     bubbleChartSvg.width = document.getElementById('bubbleChart').clientWidth;
-    bubbleChartSvg.height = 800; //document.getElementById('bubbleChart').clientHeight;
-
+    //bubbleChartSvg.height = 800; //document.getElementById('bubbleChart').clientHeight;
+    bubbleChartSvg.height = $('#fh5co-main').height() - $('#selectDiv').height();
     var padding = 90;
-
 
     createSvg(bubbleChartSvg);
 
@@ -268,10 +258,10 @@ function drawBubbleChart(whereCondition) {
                     });
             }
             let sleepTime = Math.floor((data.value) / 1000);
-            let aggregateSelectText = $('input[name="aggregate"]:checked').next("label:first").html();
-            let statusSelectText = $('input[name="status"]:checked').next("label:first").html();
+            let aggregateSelectText = $('input[name="aggregate"]:checked').val() == "sum"?"加總":"平均";
+            let statusSelectText = $('input[name="status"]:checked').val() == "totalSleepTime"?"睡眠時間":"賴床時間";
 
-            $("#diagram .content").append(aggregateSelectText + " " + statusSelectText + " : " + sleepTime + "秒<br>　＝　" + (sleepTime / 60).toFixed(1) + "分<br>　＝　" + (sleepTime / 3600).toFixed(2) + "小時");
+            $("#diagram .content").append(aggregateSelectText + " " + statusSelectText + " : <br>　＝　" + sleepTime + "秒<br>　＝　" + (sleepTime / 60).toFixed(1) + "分<br>　＝　" + (sleepTime / 3600).toFixed(2) + "小時");
 
             //set data
             $("#diagram").data("sleeptime", sleepTime);
@@ -350,9 +340,9 @@ function drawForceLayout(dataSet) {
 
     let forceLayoutSvg = {};
     forceLayoutSvg.width = document.getElementById('bubbleChart').clientWidth;
-    forceLayoutSvg.height = 800; //document.getElementById('bubbleChart').clientHeight;
+    //forceLayoutSvg.height = 800; //document.getElementById('bubbleChart').clientHeight;
+    forceLayoutSvg.height = $('#fh5co-main').height() - $('#selectDiv').height();
     var padding = 30;
-
 
     createSvg(forceLayoutSvg);
     //dataSet = bind(dataSet)
@@ -532,7 +522,7 @@ function createSvg(svg) {
     d3.select("#bubbleChart svg").append("g").append("rect").attr({
         width: "100%",
         height: "100%",
-        fill: "white"
+        fill: "transparent"
     });
 
 }

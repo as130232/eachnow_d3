@@ -34,6 +34,7 @@
 	<link rel="stylesheet" href="css/icomoon.css">
 	<!-- Bootstrap  -->
 	<link rel="stylesheet" href="css/bootstrap.css">
+	<link rel="stylesheet" href="css/AdminLTE.css">
 	<!-- Owl Carousel -->
 	<link rel="stylesheet" href="css/owl.carousel.min.css">
 	<link rel="stylesheet" href="css/owl.theme.default.min.css">
@@ -43,6 +44,8 @@
 	<link rel="stylesheet" href="stylesheets/main.css">
 	<link rel="stylesheet" href="stylesheets/barChart.css">
 	<link rel="stylesheet" href="stylesheets/taiwanMap.css">
+	<link rel="stylesheet" href="stylesheets/bubbleChart.css">
+	<link rel="stylesheet" href="stylesheets/scatterDiagram.css">
 	<!-- Lodash -->
 	<script src="https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js"></script>
 	<!-- Modernizr JS -->
@@ -61,18 +64,25 @@
 	<![endif]-->
 
 	</head>
+	<style>
+        #sidebar a{
+            font-size: 20px!important;
+            font-family: "Microsoft JhengHei"!important;
+        }
+    </style>
 	<body>
 	<div id="fh5co-page">
 		<a href="#" class="js-fh5co-nav-toggle fh5co-nav-toggle"><i></i></a>
 		<aside id="fh5co-aside" role="complementary" class="border js-fullheight">
-
+        
 			<h1 id="fh5co-logo"><a href="index.html"><img src="images/logo-colored.png" alt="Free HTML5 Bootstrap Website Template"></a></h1>
 			<nav id="fh5co-main-menu" role="navigation">
-				<ul>
-					<li class="fh5co-active"><a href="/taiwanMap/taiwanMap.html">首頁</a></li>
+				<ul id="sidebar">
+				    <li class="fh5co-active"><a href="home.html">首頁</a></li>
+					<li><a href="/taiwanMap/taiwanMap.html">地形圖</a></li>
+					<li><a href="/scatterDiagram/scatterDiagram.html">散佈圖</a></li>
 					<li><a href="/bubbleChart/bubble.html">泡泡圖</a></li>
 					<li><a href="/yearOfSleeptimes/barChart.html">長條圖</a></li>
-					<li><a href="/scatterDiagram/scatterDiagram.html">散佈圖</a></li>
 				</ul>
 			</nav>
 
@@ -112,7 +122,7 @@
 	<script src="js/main.js"></script>
 	<script>
 		window.onload=function(){
-			$( "#fh5co-main" ).load("/taiwanMap/taiwanMap.html");
+			$( "#fh5co-main" ).load("/home.html");
 		}
 		$( "#fh5co-main-menu li" ).on("click","a",function(e){
 			e.preventDefault();

@@ -3,6 +3,9 @@ $barChartBg:rgb(248,255,229);
 #barChart_div{
     background-color: $barChartBg;
     height: 100%;
+    .selectOption{
+        margin-top: 20px;
+    }    
     #yearOfSleeptimes{
         position: absolute;
         right:2px;
