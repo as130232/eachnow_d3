@@ -1,17 +1,8 @@
 //大圈:行業別 - 城市別 - 男女別
 
-window.onload = init;
+init();
 
-function init() {
-
-    d3.select("body").append("svg")
-        .attr({
-            width:900,
-            height:400,
-        })
-        .append('g')
-        .append("rect");
-    
+function init(){
     
     function setAllQuerySelectValue() {
         let whereCondition = {};
@@ -65,10 +56,9 @@ function drawBubbleChart(whereCondition) {
 
     let bubbleChartSvg = {};
     bubbleChartSvg.width = document.getElementById('bubbleChart').clientWidth;
-    bubbleChartSvg.height = 800; //document.getElementById('bubbleChart').clientHeight;
-
+    //bubbleChartSvg.height = 800; //document.getElementById('bubbleChart').clientHeight;
+    bubbleChartSvg.height = $('#fh5co-main').height() - $('#selectDiv').height();
     var padding = 90;
-
 
     createSvg(bubbleChartSvg);
 
@@ -349,9 +339,9 @@ function drawForceLayout(dataSet) {
 
     let forceLayoutSvg = {};
     forceLayoutSvg.width = document.getElementById('bubbleChart').clientWidth;
-    forceLayoutSvg.height = 800; //document.getElementById('bubbleChart').clientHeight;
+    //forceLayoutSvg.height = 800; //document.getElementById('bubbleChart').clientHeight;
+    forceLayoutSvg.height = $('#fh5co-main').height() - $('#selectDiv').height();
     var padding = 30;
-
 
     createSvg(forceLayoutSvg);
     render(dataSet);
@@ -473,7 +463,7 @@ function createSvg(svg) {
     d3.select("#bubbleChart svg").append("g").append("rect").attr({
         width: "100%",
         height: "100%",
-        fill: "white"
+        fill: "transparent"
     });
 
 }

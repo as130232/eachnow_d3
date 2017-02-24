@@ -1,0 +1,68 @@
+/* line 1, ../../sass/bubbleChart.scss */
+#bubbleChart_div {
+  height: 100%;
+}
+/* line 3, ../../sass/bubbleChart.scss */
+#bubbleChart_div .container {
+  height: 100%;
+}
+/* line 6, ../../sass/bubbleChart.scss */
+#bubbleChart_div #selectDiv {
+  font-family: "Microsoft JhengHei";
+  margin-top: 20px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+/* line 11, ../../sass/bubbleChart.scss */
+#bubbleChart_div #selectDiv .selectOption {
+  display: inline-flex;
+}
+/* line 14, ../../sass/bubbleChart.scss */
+#bubbleChart_div #selectDiv .radioBtns {
+  display: flex;
+}
+/* line 16, ../../sass/bubbleChart.scss */
+#bubbleChart_div #selectDiv .radioBtns .radio {
+  width: inherit;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  line-height: 50px;
+  align-items: center;
+}
+/* line 22, ../../sass/bubbleChart.scss */
+#bubbleChart_div #selectDiv .radioBtns .radio .iradio_minimal {
+  background: none;
+  vertical-align: baseline;
+}
+/* line 29, ../../sass/bubbleChart.scss */
+#bubbleChart_div #diagram,
+#bubbleChart_div #diagram2 {
+  height: auto;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+  font-family: "Microsoft JhengHei";
+  margin-left: 10px;
+  margin-bottom: 20px;
+}
+/* line 44, ../../sass/bubbleChart.scss */
+#bubbleChart_div #diagram2 {
+  top: 350px;
+}
+/* line 48, ../../sass/bubbleChart.scss */
+#bubbleChart_div #diagram.hidden, #bubbleChart_div #diagram2.hidden {
+  display: none;
+}
+/* line 52, ../../sass/bubbleChart.scss */
+#bubbleChart_div .content {
+  font-family: "Microsoft JhengHei";
+  font-size: 30px;
+  color: #fff;
+  background: none;
+  padding: 0px;
+}
+/* line 60, ../../sass/bubbleChart.scss */
+#bubbleChart_div #conversionValue {
+  font-size: 40px;
+  color: #FF1493;
+}

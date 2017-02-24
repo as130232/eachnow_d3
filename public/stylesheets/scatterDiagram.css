@@ -1,0 +1,9 @@
+/* line 2, ../../sass/scatterDiagram.scss */
+#scatterDiagram_div .selectRow {
+  margin-top: 20px;
+}
+/* line 4, ../../sass/scatterDiagram.scss */
+#scatterDiagram_div .selectRow #selectLabel {
+  line-height: 50px;
+  margin-left: 34px;
+}

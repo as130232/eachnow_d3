@@ -11,7 +11,7 @@ class ScatterDiagram {
             maxAvgSleepHr: 0,
             minAvgSleepInMinutes: 0,
             maxAvgSleepInMinutes: 0,
-            svgWidth: 900,
+            svgWidth: document.getElementById('scatterDiagramContainer').clientWidth,
             svgHeight: 600,
             svgPadding: 60,
             dataArray: [],
@@ -22,14 +22,14 @@ class ScatterDiagram {
         this.render();
         this.selectBtn();
     }
-    bind(selectedDataArray){
+    bind(){
         const selection = d3.select('#scatterDiagram_SVG')
                             .selectAll('circle')
-                            .data(selectedDataArray || this.attribute.dataArray);
+                            .data(this.attribute.dataArray);
         selection.enter().append("circle");
         selection.exit().remove();
     }
-    setScale(selectedDataArray){
+    setScale(){
         let memberTotalAndAvgSleepTime = getAllTotalAndAvgSleepTime();
         let dataArray = [];
         memberTotalAndAvgSleepTime.map(function(aMember,index){
@@ -47,28 +47,28 @@ class ScatterDiagram {
         });
         
         this.attribute.dataArray = dataArray;
-
+        
         //X軸:年齡
-        this.attribute.minAge = d3.min(selectedDataArray||dataArray,function(d){
+        this.attribute.minAge = d3.min(dataArray,function(d){
             return d.age;
         });
-        this.attribute.maxAge = d3.max(selectedDataArray||dataArray,function(d){
+        this.attribute.maxAge = d3.max(dataArray,function(d){
             return d.age;
         })
         
         //Y軸:avg睡眠時間
-        this.attribute.minAvgSleepHr = d3.min(selectedDataArray||dataArray,function(d){
+        this.attribute.minAvgSleepHr = d3.min(dataArray,function(d){
             return d.avg_totalSleepTime;
         });
-        this.attribute.maxAvgSleepHr = d3.max(selectedDataArray||dataArray,function(d){
+        this.attribute.maxAvgSleepHr = d3.max(dataArray,function(d){
             return d.avg_totalSleepTime;
         });
 
         //R半徑:avg賴床時間
-        this.attribute.minAvgSleepInMinutes = d3.min(selectedDataArray||dataArray,function(d){
+        this.attribute.minAvgSleepInMinutes = d3.min(dataArray,function(d){
             return d.avg_sleepInTime;
         });
-        this.attribute.maxAvgSleepInMinutes = d3.max(selectedDataArray||dataArray,function(d){
+        this.attribute.maxAvgSleepInMinutes = d3.max(dataArray,function(d){
             return d.avg_sleepInTime;
         });
     }
@@ -80,6 +80,7 @@ class ScatterDiagram {
             })
     }
     render(){
+        //console.log(this.attribute.dataArray)
         let width = this.attribute.svgWidth;
         let height = this.attribute.svgHeight;
         let padding = this.attribute.svgPadding;
@@ -95,6 +96,12 @@ class ScatterDiagram {
                     .domain([this.attribute.minAvgSleepInMinutes, this.attribute.maxAvgSleepInMinutes])
                     .range([this.attribute.minAvgSleepInMinutes,this.attribute.maxAvgSleepInMinutes]);
 
+        // let force = d3.layout.force()
+        //                      .gravity(0.1)
+        //                      .charge(-600)
+        //                      .nodes(this.attribute.dataArray)// 綁定資料
+        //                      .size([width, height])// 設定範圍
+        
         d3.select('#scatterDiagram_SVG')
           .selectAll('circle')
           .attr({
@@ -113,18 +120,24 @@ class ScatterDiagram {
                 return colorArray[jobArray.indexOf(d.job)];
               }
           });
-          
+
           //X軸
           let xAxis = d3.svg.axis()
                             .scale(xScale) //指定軸線的比例尺為xScale
                             .orient("bottom") //設定刻度在右:表示垂直，刻度朝底下(用以表示x軸)
                             .ticks(10); //x軸上間距為8個刻度
+          
           //Y軸
           let yAxis = d3.svg.axis()
                             .scale(yScale)
                             .orient("left")
                             .ticks(4);  //x軸上間距為2個刻度
-            //2.將x軸畫在svg上，並增加axis定義的css 調整軸線及文字樣式
+          
+          //2.將x軸畫在svg上，並增加axis定義的css 調整軸線及文字樣式
+
+          d3.select('#scatterDiagram_SVG').select('g#axisX').remove();
+          d3.select('#scatterDiagram_SVG').select('g#axisY').remove();
+          
           d3.select('#scatterDiagram_SVG')
             .append("g")
             .attr({
@@ -143,17 +156,48 @@ class ScatterDiagram {
                 //將軸線作位移 (將x軸移到最下方) translate(x, y);
                 transform: "translate(" + parseInt(padding - 7) + "," + 0 + ")",
             })
-            .call(yAxis);
+           .call(yAxis);
+    }
+    tick(){
+        let dataArray = this.attribute.dataArray;
+        var q = d3.geom.quadtree(dataArray),
+                i = 0,
+                n = dataArray.length;
+        while (++i < n) { q.visit(collide(dataArray[i])); }
+        function collide(node) {
+            var r = node.radius + 16,
+                nx1 = node.x - r,
+                nx2 = node.x + r,
+                ny1 = node.y - r,
+                ny2 = node.y + r;
+            return function(quad, x1, y1, x2, y2) {
+                if (quad.point && (quad.point !== node)) {
+                    var x = node.x - quad.point.x,
+                        y = node.y - quad.point.y,
+                        l = Math.sqrt(x * x + y * y),
+                        r = node.radius + quad.point.radius;
+                    if (l < r) {
+                        l = (l - r) / l * .5;
+                        node.x -= x *= l;
+                        node.y -= y *= l;
+                        quad.point.x += x;
+                        quad.point.y += y;
+                    }
+                }
+                return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+            };
+        }
     }
     selectBtn(){
         let jobArray=this.attribute.dataArray.map(function(aMember,index){
             return aMember.job
         });
         let uniqJobArray = _.uniq(jobArray);
-
+        //console.log(uniqJobArray)
         let selectOption = d3.select('#jobSelect')
                              .selectAll('option')
                              .data(uniqJobArray);
+        
         selectOption.enter().append("option")
                  .property({
                     value: function (d) {
@@ -172,10 +216,10 @@ class ScatterDiagram {
     update(value){
         //console.log('select value:', value);
         let selectedDataArray = _.filter(this.attribute.dataArray,['job',value]);
+        this.attribute.dataArray = selectedDataArray;
         this.bind(selectedDataArray);
         this.setScale(selectedDataArray);
-        d3.select('#scatterDiagram_SVG').select('g#axisX').remove();
-        d3.select('#scatterDiagram_SVG').select('g#axisY').remove();
+        
         this.render();
     }
 }
