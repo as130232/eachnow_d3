@@ -7,3 +7,27 @@
   line-height: 50px;
   margin-left: 34px;
 }
+/* line 9, ../../sass/scatterDiagram.scss */
+#scatterDiagram_div #tooltip {
+  position: absolute;
+  background: #fff;
+  width: 250px;
+  height: auto;
+  padding: 0px 10px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+}
+/* line 20, ../../sass/scatterDiagram.scss */
+#scatterDiagram_div #tooltip .title {
+  font-weight: bold;
+  display: inline-flex;
+}
+/* line 24, ../../sass/scatterDiagram.scss */
+#scatterDiagram_div #tooltip p {
+  margin-bottom: 0em;
+  display: inline-block;
+}
+/* line 28, ../../sass/scatterDiagram.scss */
+#scatterDiagram_div #tooltip.hidden {
+  display: none;
+}

@@ -6,4 +6,27 @@
             margin-left: 34px;
         }
     }
+    #tooltip{
+        position: absolute;
+        background: #fff;
+        width: 250px;
+        height: auto;
+        padding: 0px 10px;
+        border-radius: 10px;
+        box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
+    }
+    #tooltip{
+        //display: table;
+        .title{
+            font-weight: bold;
+            display: inline-flex;
+        }
+        p{
+            margin-bottom: 0em;
+            display: inline-block;
+        }
+        &.hidden{
+            display: none;
+        }
+    }
 }

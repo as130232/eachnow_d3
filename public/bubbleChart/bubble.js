@@ -258,10 +258,10 @@ function drawBubbleChart(whereCondition) {
                     });
             }
             let sleepTime = Math.floor((data.value) / 1000);
-            let aggregateSelectText = $('input[name="aggregate"]:checked').next("label:first").html();
-            let statusSelectText = $('input[name="status"]:checked').next("label:first").html();
+            let aggregateSelectText = $('input[name="aggregate"]:checked').val() == "sum"?"加總":"平均";
+            let statusSelectText = $('input[name="status"]:checked').val() == "totalSleepTime"?"睡眠時間":"賴床時間";
 
-            $("#diagram .content").append(aggregateSelectText + " " + statusSelectText + " : " + sleepTime + "秒<br>　＝　" + (sleepTime / 60).toFixed(1) + "分<br>　＝　" + (sleepTime / 3600).toFixed(2) + "小時");
+            $("#diagram .content").append(aggregateSelectText + " " + statusSelectText + " : <br>　＝　" + sleepTime + "秒<br>　＝　" + (sleepTime / 60).toFixed(1) + "分<br>　＝　" + (sleepTime / 3600).toFixed(2) + "小時");
 
             //set data
             $("#diagram").data("sleeptime", sleepTime);
@@ -336,6 +336,7 @@ function drawBubbleChart(whereCondition) {
 function drawForceLayout(dataSet) {
     $("#bubbleChart svg").remove();
 
+    row(dataSet);
 
     let forceLayoutSvg = {};
     forceLayoutSvg.width = document.getElementById('bubbleChart').clientWidth;
@@ -344,13 +345,74 @@ function drawForceLayout(dataSet) {
     var padding = 30;
 
     createSvg(forceLayoutSvg);
+    //dataSet = bind(dataSet)
     render(dataSet);
 
+    function row(dataSet) {
+        //        dataSet.forEach(function (data) {
+        //            data.source =
+        //                data.target =
+        //        })
+    }
+
+    function bind(dataSet) {
+        let whereCondition = {
+            firstStructure: "job"
+        };
+        let nestedDataSet = d3.nest()
+            //先按照職業區分
+            .key(function (data) {
+                let result = judgeStructure(data, whereCondition.firstStructure);
+                return result;
+                //return data.member[0][whereCondition.firstStructure]
+            })
+
+        //entries : 資料來源
+        .entries(dataSet);
+
+        return nestedDataSet;
+    }
+
     function render(dataSet) {
-        var circles = d3.select("#bubbleChart svg").selectAll("circle").data(dataSet).enter().append("circle");
+        
+        
+        var force = d3.layout.force()   // 建立 Layout
+            .nodes(dataSet)             // 綁定資料
+            //.links(dataSet)
+            //.friction(0.8)            //摩擦係數
+            .gravity(0.6)               //引力
+            .charge(-150)               //電荷強度
+            .size([forceLayoutSvg.width, forceLayoutSvg.height]) // 設定範圍
+            .on("tick", tick)           // 設定 tick 函式
+            .start();
+
+
+        var circles = d3.select("#bubbleChart svg")
+            .selectAll("circle")
+            .data(dataSet)
+            .enter()
+            .append("circle")
+
+
+        d3.select("body")
+            .on("mousedown", mousedown);
+
+        function mousedown() {
+            circles.forEach(function (o, i) {
+                o.x += (Math.random() - .50) * 40;
+                o.y += (Math.random() - .50) * 40;
+            });
+            force.resume();
+        }
 
         let originalColor;
+
+        //add eventListener
         d3.select("#bubbleChart svg").selectAll("circle")
+            .call(force.drag)
+            .on("mousedown", function () {
+                d3.event.stopPropagation();
+            })
             .on("mouseover", function (data) {
                 originalColor = d3.select(this).attr("fill");
                 d3.select(this).attr({
@@ -359,7 +421,6 @@ function drawForceLayout(dataSet) {
                 })
                 $("#diagram").css("background-color", "#00BFFF");
                 $("#diagram2").css("background-color", "#00BFFF");
-                
                 //console.log(data);
                 showMemberInfoDiagram(data);
             })
@@ -369,9 +430,8 @@ function drawForceLayout(dataSet) {
                 })
             })
             .on("click", function (data) {
-                console.log(data);
-
-                d3.select("svg").selectAll("circle").remove("mouseover");
+                //console.log(data);
+                //d3.select("svg").selectAll("circle").remove("mouseover");
 
             });
 
@@ -396,14 +456,13 @@ function drawForceLayout(dataSet) {
                         return "#eee";
                     }
                 },
+                //                transform: function (d) {
+                //                    return "translate(" + d.x + "," + d.y + ")";
+                //                },
+
             });
         }
 
-        var force = d3.layout.force() // 建立 Layout
-            .nodes(dataSet) // 綁定資料
-            .size([forceLayoutSvg.width, forceLayoutSvg.height]) // 設定範圍
-            .on("tick", tick) // 設定 tick 函式
-            .start();
 
         function showMemberInfoDiagram(data) {
             d3.select("#diagram").classed("hidden", false);
@@ -412,7 +471,7 @@ function drawForceLayout(dataSet) {
             d3.select("#diagram2").classed("hidden", false);
             $("#diagram2 .title").empty();
             $("#diagram2 .content").empty();
-            
+
             d3.select("#diagram .title").append("text")
                 .text("會員:" + data.member[0].name)
                 .style({
@@ -420,14 +479,14 @@ function drawForceLayout(dataSet) {
                     "font-size": "40px",
                     "font-family": "Microsoft JhengHei",
                 });
-            
+
             $("#diagram .content").append("性別:" + data.member[0].gender + "<br>");
             $("#diagram .content").append("生日:" + data.member[0].birth + "<br>");
             $("#diagram .content").append("住址:" + data.member[0].address + "<br>");
             $("#diagram .content").append("工作:" + data.member[0].job);
-            
-           
-             d3.select("#diagram2 .title").append("text")
+
+
+            d3.select("#diagram2 .title").append("text")
                 .text("整年睡眠統計")
                 .style({
                     "color": "#fff",
@@ -438,12 +497,12 @@ function drawForceLayout(dataSet) {
             $("#diagram2 .content").append("平均睡眠: " + convertToHour(data.avg_totalSleepTime) + " 小時<br>");
             $("#diagram2 .content").append("總 賴 床 : " + convertToHour(data.sum_sleepInTime) + " 小時<br>");
             $("#diagram2 .content").append("平均賴床: " + convertToHour(data.avg_sleepInTime) + " 小時<br>");
-            
-            function convertToHour(data){
-                let result = (data/(60 * 60 * 1000));
+
+            function convertToHour(data) {
+                let result = (data / (60 * 60 * 1000));
                 var rgexp = /^[0-9]*[1-9][0-9]*$/;
                 //判斷是否為浮點數
-                if(!rgexp.test(result)){
+                if (!rgexp.test(result)) {
                     //是浮點數取小數點第二位
                     return result.toFixed(2);
                 }
