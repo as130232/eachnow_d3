@@ -80,10 +80,14 @@ class ScatterDiagram {
             })
     }
     render(){
-        //console.log(this.attribute.dataArray)
         let width = this.attribute.svgWidth;
         let height = this.attribute.svgHeight;
         let padding = this.attribute.svgPadding;
+
+        // setInterval(function(){
+        //     width = width+50;
+        //     console.log(width)
+        // },1000);
         let xScale = d3.scale.linear()
                     .domain([this.attribute.minAge,this.attribute.maxAge])
                     .range([padding,(width-padding)]);
@@ -95,16 +99,9 @@ class ScatterDiagram {
         let rScale = d3.scale.linear()
                     .domain([this.attribute.minAvgSleepInMinutes, this.attribute.maxAvgSleepInMinutes])
                     .range([this.attribute.minAvgSleepInMinutes,this.attribute.maxAvgSleepInMinutes]);
-
-        // let force = d3.layout.force()
-        //                      .gravity(0.1)
-        //                      .charge(-600)
-        //                      .nodes(this.attribute.dataArray)// 綁定資料
-        //                      .size([width, height])// 設定範圍
         
-        d3.select('#scatterDiagram_SVG')
-          .selectAll('circle')
-          .attr({
+        let circles = d3.select('#scatterDiagram_SVG').selectAll('circle');
+         circles.attr({
               cx: function(d){
                 return xScale(d.age);
               },
@@ -157,36 +154,15 @@ class ScatterDiagram {
                 transform: "translate(" + parseInt(padding - 7) + "," + 0 + ")",
             })
            .call(yAxis);
-    }
-    tick(){
+
+        let force = d3.layout.force()
+                        .nodes(this.attribute.dataArray)// 綁定資料
+                        .size([width, height])// 設定範圍
+                        .gravity(0.04)
+                        .charge(-30)
         let dataArray = this.attribute.dataArray;
-        var q = d3.geom.quadtree(dataArray),
-                i = 0,
-                n = dataArray.length;
-        while (++i < n) { q.visit(collide(dataArray[i])); }
-        function collide(node) {
-            var r = node.radius + 16,
-                nx1 = node.x - r,
-                nx2 = node.x + r,
-                ny1 = node.y - r,
-                ny2 = node.y + r;
-            return function(quad, x1, y1, x2, y2) {
-                if (quad.point && (quad.point !== node)) {
-                    var x = node.x - quad.point.x,
-                        y = node.y - quad.point.y,
-                        l = Math.sqrt(x * x + y * y),
-                        r = node.radius + quad.point.radius;
-                    if (l < r) {
-                        l = (l - r) / l * .5;
-                        node.x -= x *= l;
-                        node.y -= y *= l;
-                        quad.point.x += x;
-                        quad.point.y += y;
-                    }
-                }
-                return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-            };
-        }
+        
+        
     }
     selectBtn(){
         let jobArray=this.attribute.dataArray.map(function(aMember,index){
@@ -217,9 +193,8 @@ class ScatterDiagram {
         //console.log('select value:', value);
         let selectedDataArray = _.filter(this.attribute.dataArray,['job',value]);
         this.attribute.dataArray = selectedDataArray;
-        this.bind(selectedDataArray);
-        this.setScale(selectedDataArray);
-        
+        this.bind();
+        this.setScale();
         this.render();
     }
 }

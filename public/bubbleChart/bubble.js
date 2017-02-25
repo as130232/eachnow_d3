@@ -451,7 +451,6 @@ function drawForceLayout(dataSet) {
             }
         }
     }
-
 }
 
 
@@ -465,5 +464,4 @@ function createSvg(svg) {
         height: "100%",
         fill: "transparent"
     });
-
 }

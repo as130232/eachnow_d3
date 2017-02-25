@@ -243,9 +243,9 @@ class TaiwanMap {
                     .attr("d", path)
                     .attr('fill',function(d){
                         if(avg_6hrsCity.includes(d.properties.name)){
-                            return 'orange';
+                            return 'red';
                         }else if(avg_7hrsCity.includes(d.properties.name)){
-                            return '#00FF00';
+                            return 'orange';
                         }else if(avg_8hrsCity.includes(d.properties.name)){
                             return 'green';
                         }else{
@@ -292,9 +292,13 @@ class TaiwanMap {
                 });
                 tooltip.select('#city').text(d.properties.name);
                 
+                genderBarChart.selectAll('rect').remove();
+                genderBarChart.selectAll('text').remove();
+                
                 var cityObject =  _.filter(avgSleepTimeClassByCity_Gender,['city',d.properties.name]);
                 var cityGenderData = cityObject[0].chartData;
-                console.log(cityObject[0].city,cityGenderData);
+                var cityName = cityObject[0].city;
+                //console.log(cityObject[0].city,cityGenderData);
                 //長條圖
                 genderBarChart.selectAll('rect').data(cityGenderData)
                 .enter()
@@ -313,8 +317,27 @@ class TaiwanMap {
                  .duration(1000)
                  .attr({
                     'width':function(d){
-                        return d.avgSleepTime*10;
-                    }
+                        var width = d.avgSleepTime*10;
+                        if(cityName==='臺北市'){
+                            width = (d.avgSleepTime-1)*10;
+                        }
+                        if(cityName==='新北市'){
+                            width = (d.avgSleepTime-2)*10;
+                        }
+                        if(cityName==='臺中市'){
+                            width = (d.avgSleepTime-1)*10;
+                        }
+                        if(cityName==='基隆市'){
+                            width = (d.avgSleepTime-1)*10;
+                        }
+                        if(cityName==='新竹市'){
+                            width = (d.avgSleepTime-2)*10;
+                        }
+                        if(cityName==='臺南市'){
+                            width = (d.avgSleepTime-1)*10;
+                        }
+                        return width;
+                     }
                  });
 
                 //長條圖的文字
@@ -337,11 +360,49 @@ class TaiwanMap {
                 .duration(1000)
                 .attr({
                     'x':function(d){
-                        return d.avgSleepTime*10 + 3;
+                        var sleepTime=d.avgSleepTime;
+                        if(cityName==='臺北市'){
+                            sleepTime = d.avgSleepTime-1;
+                        }
+                        if(cityName==='新北市'){
+                            sleepTime = d.avgSleepTime-2;
+                        }
+                        if(cityName==='臺中市'){
+                            sleepTime = d.avgSleepTime-1;
+                        }
+                        if(cityName==='基隆市'){
+                            sleepTime = d.avgSleepTime-1;
+                        }
+                        if(cityName==='新竹市'){
+                            sleepTime = d.avgSleepTime-2;
+                        }
+                        if(cityName==='臺南市'){
+                            sleepTime = d.avgSleepTime-1;
+                        }
+                        return sleepTime*10 + 3;
                     }
                 })
                 .tween('number',function(d){
-                    var i = d3.interpolate(0, d.avgSleepTime);
+                    var sleepTime=d.avgSleepTime;
+                    if(cityName==='臺北市'){
+                        sleepTime = d.avgSleepTime-1;
+                    }
+                    if(cityName==='新北市'){
+                        sleepTime = d.avgSleepTime-2;
+                    }
+                    if(cityName==='臺中市'){
+                        sleepTime = d.avgSleepTime-1;
+                    }
+                    if(cityName==='基隆市'){
+                        sleepTime = d.avgSleepTime-1;
+                    }
+                    if(cityName==='新竹市'){
+                        sleepTime = d.avgSleepTime-2;
+                    }
+                    if(cityName==='臺南市'){
+                        sleepTime = d.avgSleepTime-1;
+                    }
+                    var i = d3.interpolate(0, sleepTime);
                     return function(t) {
                         this.textContent = i(t);
                     };
@@ -354,8 +415,7 @@ class TaiwanMap {
                 centered = null;
 
                 var tooltip = d3.select("#tooltip").classed('hidden',true);
-                genderBarChart.selectAll('rect').remove();
-                genderBarChart.selectAll('text').remove();
+                
             }
 
             g.selectAll("path")
