@@ -8,7 +8,7 @@ var Member = require('./models/member');
 var SleepTime = require('./models/sleepTime');
 
 //每個js檔案都是一個模組,輸出一個function
-module.exports = function (app) {
+module.exports = function (app, passport) {
     /*
              三種請求參數
              params: 當url中存在/member/:no ，使用req.params.no才取的到值
@@ -275,6 +275,52 @@ module.exports = function (app) {
             });
     });
 
+
+    /*
+        facebook 登入、驗證
+    */
+
+    //導向Facebook做驗證，藉由FB做授權，授權成功後將我們所需要的profile送回
+    app.get('/auth/facebook', passport.authenticate('facebook', {
+        scope: 'email',
+    }));
+    
+    //判斷登入成功或失敗
+    app.get('/auth/facebook/callback',
+        //login fail, redirect login page
+        passport.authenticate('facebook', {
+            failureRedirect: '/login'
+        }),
+        function (req, res) {
+            //successful authentication, redirect home page.
+            
+            res.redirect('/');
+        }
+    );
+
+    app.get('/logout', function (req, res) {
+        //clear session
+        req.logout();
+        //redirect home page.
+        res.redirect('/');
+    });
+
+    
+    app.get('/testfb', function (req, res) {
+        console.log("req.session in /");
+        console.log(req.session);
+        if(req.session.passport.user){
+            var member_id =  req.session.passport.user;
+            Member.findOne({"_id":member_id}, function(error, member){
+                res.send("Hello, member:" + member.profile.username);    
+            })
+            
+        }else{
+            res.send("logout successful");
+        }
+    });
+
+    
     
     
     app.get('/test', function (req, res) {
